@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Jack</title>
+    <link rel="stylesheet" type="text/css" href="/client/style.css">
+</head>
+
+<body>
+    <div id="username-form">
+        <div class="form-card">
+            <h2>Enter Your Username</h2>
+            <input type="text" id="username-input" placeholder="Username">
+            <button id="submit-username">Submit</button>
+        </div>
+    </div>
+
+    <div id="game-area">
+        <div class="circle">
+            <div class="dealer-section">
+                <h2>Dealer: <span id="dealer-sum"></span></h2>
+                <div id="dealer-cards">
+                    <img id="hidden" src="https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/BACK.png?v=1715966385973">
+                </div>
+            </div>
+            
+            <div class="player-sections">
+                <div class="player-section">
+                    <h2 id="player-heading"></h2>
+                    <div id="your-cards"></div>
+                </div>
+    
+                <div id="other-players">
+                    <!-- Other players' cards will be inserted here dynamically -->
+                </div>
+            </div>
+            
+            <br>
+            <div class="buttons">
+                <button id="start" disabled="true">Start</button>
+                <button id="hit" disabled="true">Hit</button>
+                <button id="stay" disabled="true">Stay</button>
+            </div>
+            
+            <p id="results"></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script src="/client/script.js"></script>
+</body>
+
+</html>
