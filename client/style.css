@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    background-color: rgb(27, 27, 27);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.circle {
+    width: 100vmax;
+    height: 50vmax;
+    clip-path: circle(55% at 50% 0%);
+    background: radial-gradient(
+        circle at top,
+        rgb(5, 94, 5) 0 58.5%,
+        rgb(77, 37, 37) 58.9% 62.5%,
+        rgb(37, 19, 19) 62.6% 100%
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    position: relative;
+    top: 0;
+    overflow: hidden;
+    padding-top: 2vh;
+}
+
+.dealer-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2vh;
+}
+
+.player-sections {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2vh;
+}
+
+.player-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+}
+
+#dealer-cards, #your-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#other-players {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#other-players .player-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#other-players img, #dealer-cards img, #your-cards img {
+    height: 10vh;
+    width: auto;
+    margin: 0.5vh;
+}
+
+#hit, #stay, #start {
+    width: 8vw;
+    height: 4vh;
+    font-size: 2.5vh;
+    margin: 2vh;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#results {
+    margin-top: 20px;
+    font-size: 2.5vh;
+    color: red;
+}
+
+#game-area {
+    display: none; /* Initially hidden */
+    padding: 20px;
+}
+
+#username-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+}
+
+.form-card input,
+.form-card button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.form-card button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-card button:hover {
+    background-color: #45a049;
+}
