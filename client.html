@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Jack</title>
+    <link rel="stylesheet" href="blackjack.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        #username-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+
+        .form-card input,
+        .form-card button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Ensure padding and border are included in the width */
+        }
+
+        .form-card button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .form-card button:hover {
+            background-color: #45a049;
+        }
+
+        #game-area {
+            display: none;
+            padding: 20px;
+        }
+
+        #dealer-cards img,
+        #your-cards img,
+        #other-players img {
+            height: 175px;
+            width: 125px;
+            margin: 1px;
+        }
+
+        #hit,
+        #stay,
+        #start {
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+            margin: 10px;
+        }
+
+        .player-section {
+            display: inline-block;
+            vertical-align: top;
+            margin: 10px;
+        }
+
+        #results {
+            margin-top: 20px;
+            font-size: 20px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="username-form">
+        <div class="form-card">
+            <h2>Enter Your Username</h2>
+            <input type="text" id="username-input" placeholder="Username">
+            <button id="submit-username">Submit</button>
+        </div>
+    </div>
+
+    <div id="game-area">
+        <h2>Dealer: <span id="dealer-sum"></span></h2>
+        <div id="dealer-cards">
+            <img id="hidden" src="https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/BACK.png?v=1715966385973">
+        </div>
+
+        <div class="player-section">
+            <h2 id="player-heading"></h2>
+            <div id="your-cards"></div>
+        </div>
+
+        <div class="player-section" id="other-players">
+            <!-- Other players' cards will be inserted here dynamically -->
+        </div>
+
+        <br>
+        <button id="start" disabled="true">Start</button>
+        <button id="hit" disabled="true">Hit</button>
+        <button id="stay" disabled="true">Stay</button>
+        <p id="results"></p>
+    </div>
+
+    <script>
+        const socket = io("multi-blackjack.glitch.me/");
+
+        document.getElementById('submit-username').addEventListener('click', () => {
+            const username = document.getElementById('username-input').value.trim();
+            if (username) {
+                socket.emit('choose_name', { name: username });
+            }
+        });
+
+        socket.on('name_chosen', (name) => {
+            document.getElementById('player-heading').innerText = `${name}: `;
+            document.getElementById('username-form').style.display = 'none';
+            document.getElementById('game-area').style.display = 'block';
+        });
+
+        socket.on('room_full', (message) => {
+            alert(message);
+        });
+
+        socket.on('update_game', (data) => {
+            console.log('Received game update:', data);
+
+            document.getElementById("dealer-sum").innerText = data.dealerSum ?? "";
+            document.getElementById("player-heading").innerText = `${document.getElementById('player-heading').innerText.split(':')[0]}: ${data.yourSum}`;
+
+            let dealerCards = document.getElementById("dealer-cards");
+            dealerCards.innerHTML = "";
+            data.dealerCards.forEach(card => {
+                let img = document.createElement("img");
+                img.src = card === "BACK" ? "https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/BACK.png?v=1715966385973" : "https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/" + card + ".png?v=1715966385973";
+                dealerCards.appendChild(img);
+            });
+
+            let yourCards = document.getElementById("your-cards");
+            yourCards.innerHTML = "";
+            data.yourCards.forEach(card => {
+                let img = document.createElement("img");
+                img.src = "https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/" + card + ".png?v=1715966385973";
+                yourCards.appendChild(img);
+            });
+
+            let otherPlayersDiv = document.getElementById("other-players");
+            otherPlayersDiv.innerHTML = "";
+            data.otherPlayerCards.forEach((playerData, index) => {
+                let playerDiv = document.createElement("div");
+                playerDiv.className = "player-section";
+                playerDiv.innerHTML = `<h2>${playerData.name}: ${playerData.sum}</h2>`;
+                playerData.cards.forEach(card => {
+                    let img = document.createElement("img");
+                    img.src = "https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/" + card + ".png?v=1715966385973";
+                    playerDiv.appendChild(img);
+                });
+                otherPlayersDiv.appendChild(playerDiv);
+            });
+
+            document.getElementById("hit").disabled = !data.currentPlayer || data.gameEnded;
+            document.getElementById("stay").disabled = !data.currentPlayer || data.gameEnded;
+            document.getElementById("start").disabled = !data.gameEnded;
+
+            document.getElementById("results").innerText = data.message;
+        });
+
+        document.getElementById("start").addEventListener("click", () => {
+            document.getElementById("hit").disabled = false;
+            document.getElementById("stay").disabled = false;
+            document.getElementById("your-cards").innerHTML = "";
+            document.getElementById("dealer-cards").innerHTML = '<img id="hidden" src="https://cdn.glitch.global/454fcef4-a733-4f4e-a6cc-7cf2a577d545/BACK.png?v=1715966385973">';
+            document.getElementById("results").innerText = "";
+            document.getElementById("start").disabled = true;
+
+            document.getElementById("player-heading").innerText = `${document.getElementById('player-heading').innerText.split(':')[0]}: `;
+            document.getElementById("dealer-sum").innerText = "";
+
+            document.getElementById("other-players").innerHTML = "";
+
+            socket.emit('start_game');
+        });
+
+        document.getElementById("hit").addEventListener("click", () => {
+            socket.emit('hit');
+        });
+
+        document.getElementById("stay").addEventListener("click", () => {
+            socket.emit('stay');
+        });
+    </script>
+</body>
+
+</html>
